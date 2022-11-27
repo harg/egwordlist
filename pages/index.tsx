@@ -119,7 +119,7 @@ export default function Home() {
 
   return (
     <div className='App text-center'>
-      <h1 className="text-5xl py-5 text-purple bg-slate-100">J'écris mes mots</h1>
+      <h1 className="text-4xl py-5 text-purple bg-slate-100">J'écris mes mots</h1>
       <hr />
       <br />
       <br />
@@ -134,9 +134,9 @@ export default function Home() {
       {result === res.LOOSE ?
         <div>
           <Answer word={wordToGuess} />
-          <div className="text-5xl font-bold text-pink-800 py-10">Non non, ce n'est pas ça 😐</div>
+          <div className="text-3xl font-bold text-pink-800 py-10">Non non, ce n'est pas ça 😐</div>
         </div> : ''}
-      {result === res.WIN ? <div className="text-5xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
+      {result === res.WIN ? <div className="text-3  xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
       {result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}>⚡ Nouveau mot</button> : ''}
       {result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}>✍ vérifie le mot</button></div> : ''}
     </div>
@@ -170,12 +170,14 @@ function LetterInput(props: any) {
     }
   }
 
+  // text-7xl w-14
+
   return (
     <input
       ref={textInput}
       id={props.id}
       autoCapitalize="off"
-      className="font-mono shadow appearance-none border-none rounded text-purple text-7xl leading-tight focus:outline-none focus:shadow-outline w-14 p-0 m-1 text-center"
+      className="text-2xl w-4 m-0.5 sm:text-5xl sm:w-10 sm:m-1 font-mono shadow appearance-none border-none rounded text-purple leading-tight focus:outline-none focus:shadow-outline p-0 text-center"
       maxLength={1}
       // pattern='/^[a-zàâçéèêëîïôûùüÿñæœ]$/i' // not working
       type='text'
@@ -204,7 +206,7 @@ function AnswerInput(props: any) {
   return (
     <input
       autoCapitalize="off"
-      className="font-mono shadow appearance-none border-none rounded text-pink-800 text-7xl leading-tight focus:outline-none focus:shadow-outline w-14 p-0 m-1 text-center"
+      className="text-2xl w-4 m-0.5 sm:text-5xl sm:w-10 sm:m-1 font-mono shadow appearance-none border-none rounded text-pink-800 leading-tight focus:outline-none focus:shadow-outline p-0 text-center"
       maxLength={1}
       type='text'
       value={props.letter}
