@@ -1,6 +1,5 @@
-import { cpSync } from "fs";
-import { cp } from "fs/promises";
-import { KeyboardEventHandler, ReactPropTypes, useState, useRef, useEffect } from "react"
+import { SlReload, SlPlus, SlCheck } from "react-icons/sl";
+import { useState, useRef, useEffect } from "react"
 
 const wordList = ['la moustache', 'le chemin', 'je cherche', 'un cheval', "j'achète", 'la niche', 'un chat', 'un chien'];
 // const wordlits = ['à côté de', 'alors', 'après', 'assez', "aujourd'hui", aussi, autour, autrefois, avant, avec, beaucoup, bien, bientôt, car, chez, contre, combien, comment]
@@ -123,7 +122,7 @@ export default function Home() {
       <hr />
       <br />
       <br />
-      <button ref={repeatBtn} className="inline-block px-6 py-2.5 bg-slate-400 text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-slate-400 hover:shadow-lg focus:bg-slate-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-400 active:shadow-lg transition duration-150 ease-in-out" onClick={() => speechHandler(wordToGuess)}>🔊 répète le mot</button>
+      <button ref={repeatBtn} className="inline-block px-6 py-2.5 bg-slate-400 text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-slate-400 hover:shadow-lg focus:bg-slate-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-400 active:shadow-lg transition duration-150 ease-in-out" onClick={() => speechHandler(wordToGuess)}><SlReload className="inline-block align-middle" /> répète le mot</button>
       <br />
       <br />
       <div ref={textInputs}>
@@ -137,8 +136,8 @@ export default function Home() {
           <div className="text-3xl font-bold text-pink-800 py-10">Non non, ce n'est pas ça 😐</div>
         </div> : ''}
       {result === res.WIN ? <div className="text-3xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
-      {result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}>⚡ Nouveau mot</button> : ''}
-      {result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}>✍ vérifie le mot</button></div> : ''}
+      {result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}><SlPlus className="inline-block align-middle" /> Nouveau mot</button> : ''}
+      {result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}><SlCheck className="inline-block align-middle" /> vérifie le mot</button></div> : ''}
     </div>
 
   )
