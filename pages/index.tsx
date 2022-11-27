@@ -136,7 +136,7 @@ export default function Home() {
           <Answer word={wordToGuess} />
           <div className="text-3xl font-bold text-pink-800 py-10">Non non, ce n'est pas ça 😐</div>
         </div> : ''}
-      {result === res.WIN ? <div className="text-3  xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
+      {result === res.WIN ? <div className="text-3xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
       {result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}>⚡ Nouveau mot</button> : ''}
       {result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}>✍ vérifie le mot</button></div> : ''}
     </div>
