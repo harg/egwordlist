@@ -1,71 +1,104 @@
 import { SlReload, SlPlus, SlCheck } from "react-icons/sl";
 import { useState, useRef, useEffect } from "react"
 
-const wordList = ['la moustache', 'le chemin', 'je cherche', 'un cheval', "j'achète", 'la niche', 'un chat', 'un chien'];
+
+const initialWordList = ['la moustache', 'le chemin', 'je cherche', 'un cheval', "j'achète", 'la niche', 'un chat', 'un chien'];
+const initialWordToGuess = ''; // initialWordList[Math.floor(Math.random() * initialWordList.length)]
+
+// const useWLStore: any = create((set, get) => ({
+//   wordList: initialWordList,
+//   wordToGuess: initialWordToGuess,
+//   setWordToGuess: () => set((state :any) => ({ wordToGuess: get().wordList[Math.floor(Math.random() * get().wordList.length)] })),
+// }));
+
+// 
 // const wordlits = ['à côté de', 'alors', 'après', 'assez', "aujourd'hui", aussi, autour, autrefois, avant, avec, beaucoup, bien, bientôt, car, chez, contre, combien, comment]
 // 'C;;;;;;;; O;;;;;;;; M;;;;;;;; M;;;;;;;; É;;;;;;;; N;;;;;;;; T;;;;;;;;'
 
 
 // TODO : onfocus sur letter => focus sur dernier input
-// TODO : backspace or delete handle => remmove last last ref (focus auto sur dernier)
 
-const wordToGuess = wordList[Math.floor(Math.random() * wordList.length)];
+const res = {
+  NO_RESULT: '',
+  WIN: 'win',
+  LOOSE: 'loose',
+}
 
+const initialGameState = {
+  ids : [0],
+  letters: [],
+  inputRefs: [],
+  result: res.NO_RESULT,
+}
 
 export default function Home() {
+  // const wordList = useWLStore((state:any) => state.wordList);
+  // const wordToGuess = wordList[Math.floor(Math.random() * wordList.length)]
+  //const wordToGuess = useWLStore((state:any) => state.wordToGuess);
+  // const setWordToGuess = useWLStore((state:any) => state.setWordToGuess);
+  
+  const [appState, setAppState] = useState<any>({wordlist: initialWordList, wordToGuess:  initialWordList[Math.floor(Math.random() * initialWordList.length)]})
 
-  const res = {
-    NO_RESULT: '',
-    WIN: 'win',
-    LOOSE: 'loose',
+
+  const handleNewGame = () => {
+    console.log("handleNewGame")
+    const newWordToGuess = initialWordList[Math.floor(Math.random() * initialWordList.length)]
+    setAppState({...appState, wordToGuess: newWordToGuess})
   }
+  
+  // useEffect(() => {
+  //   handleNewGame()
+  // }, []);
+
+  return(<Game wordToGuess={appState.wordToGuess} handleNewGame={handleNewGame} />)
+}
+
+
+
+function Game(props: any) {
 
   const textInputs = useRef<any>(null);
   const repeatBtn = useRef<any>(null);
-  const [ids, setIds] = useState<number[]>([0]);
-  const [letters, setLetters] = useState<string[]>([]);
-  const [inputRefs, setInputRefs] = useState<any[]>([]);
-  const [result, setResult] = useState<string>(res.NO_RESULT);
 
-
+  const [gameState, setGameState] = useState<any>(initialGameState)
+  const [say, setSay] = useState<any>(true)
 
   const handleInputLetter = (id: number, ref: any, letter: string) => {
-    const ids_cp = Array.from(ids, e => e)
+    
+    const ids_cp = gameState.ids.slice()
     ids_cp[id + 1] = id + 1
-    setIds(ids_cp)
-
-    const letters_cp = Array.from(letters, e => e)
+    
+    const letters_cp = gameState.letters.slice()
     letters_cp[id] = letter
-    setLetters(letters_cp)
-
-    const inputRefs_cp = Array.from(inputRefs, e => e)
+    
+    const inputRefs_cp = gameState.inputRefs.slice()
     inputRefs_cp[id] = ref
-    setInputRefs(inputRefs_cp)
+
+    setGameState({...gameState, ids: ids_cp, letters: letters_cp, inputRefs: inputRefs_cp})
   }
 
   const handleDeleteLetter = () => {
-    if (ids.length > 1) {
-      const ids_cp = Array.from(ids, e => e)
+    if (gameState.ids.length > 1) {
+      const ids_cp = gameState.ids.slice()
       ids_cp.pop()
-      setIds(ids_cp)
-
-      const letters_cp = Array.from(letters, e => e)
+      
+      const letters_cp = gameState.letters.slice()
       letters_cp.pop()
-      setLetters(letters_cp)
 
-      const inputRefs_cp = Array.from(inputRefs, e => e)
+      const inputRefs_cp = gameState.inputRefs.slice()
       inputRefs_cp.pop()
-      setInputRefs(inputRefs_cp)
+
+      setGameState({...gameState, ids: ids_cp, letters: letters_cp, inputRefs: inputRefs_cp})
     }
 
   }
 
-  const speechHandler = (str: string) => {
+  const speechHandler = () => {
     let a = 'le mot'
-    if  (wordToGuess.trim().includes(' ') || wordToGuess.includes("'")) {
+    if  (props.wordToGuess.trim().includes(' ') || props.wordToGuess.includes("'")) {
       a = 'les mots'
     }
-    speech("écris " + a + " :" + wordToGuess)
+    speech("écris " + a + " :" + props.wordToGuess)
     focusLastInput()
   }
 
@@ -77,12 +110,12 @@ export default function Home() {
   }
 
   const submitWord = () => {
-    if (wordToGuess.toUpperCase() === letters.join('').toUpperCase()) {
-      setResult(res.WIN)
+    if (props.wordToGuess.toUpperCase() === gameState.letters.join('').toUpperCase()) {
+      setGameState({...gameState, result: res.WIN})
       speech("Bien joué!")
       // window.location.reload();
     } else {
-      setResult(res.LOOSE)
+      setGameState({...gameState, result: res.LOOSE})
       speech("Non, ce n'est pas ça")
     }
     focusLastInput()
@@ -93,7 +126,9 @@ export default function Home() {
   }
 
   const reloadGame = () => {
-    window.location.reload();
+    setGameState(initialGameState)
+    props.handleNewGame()
+    setSay(true)
   }
 
   useEffect(() => {
@@ -101,18 +136,15 @@ export default function Home() {
     if (textInputs !== null) {
       textInputs.current.lastChild.value = ''
     }
-
+    if (say) {
+      setTimeout(speechHandler, 300)
+      setSay(false)
+    }
   });
 
   useEffect(() => {
-    
-
-    repeatBtn.current?.click();
-    console.log(repeatBtn)
-
-    //speechHandler("écris " + a + " :" + wordToGuess)
+    console.log("first render")
   }, []);
-
 
 
 
@@ -122,22 +154,22 @@ export default function Home() {
       <hr />
       <br />
       <br />
-      <button ref={repeatBtn} className="inline-block px-6 py-2.5 bg-slate-400 text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-slate-400 hover:shadow-lg focus:bg-slate-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-400 active:shadow-lg transition duration-150 ease-in-out" onClick={() => speechHandler(wordToGuess)}><SlReload className="inline-block align-middle" /> répète le mot</button>
+      <button ref={repeatBtn} className="inline-block px-6 py-2.5 bg-slate-400 text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-slate-400 hover:shadow-lg focus:bg-slate-400 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-slate-400 active:shadow-lg transition duration-150 ease-in-out" onClick={() => speechHandler()}><SlReload className="inline-block align-middle" /> Dis les mots</button>
       <br />
       <br />
       <div ref={textInputs}>
-        {ids.map((id: number) => {
+        {gameState.ids.map((id: number) => {
           return (<LetterInput id={id} key={id} handleInputLetter={handleInputLetter} focusLastInput={focusLastInput} handleDeleteLetter={handleDeleteLetter} />)
         })}
       </div>
-      {result === res.LOOSE ?
+      {gameState.result === res.LOOSE ?
         <div>
-          <Answer word={wordToGuess} />
+          <Answer word={props.wordToGuess} />
           <div className="text-3xl font-bold text-pink-800 py-10">Non non, ce n'est pas ça 😐</div>
         </div> : ''}
-      {result === res.WIN ? <div className="text-3xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
-      {result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}><SlPlus className="inline-block align-middle" /> Nouveau mot</button> : ''}
-      {result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}><SlCheck className="inline-block align-middle" /> vérifie le mot</button></div> : ''}
+      {gameState.result === res.WIN ? <div className="text-3xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
+      {gameState.result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}><SlPlus className="inline-block align-middle" /> Nouveaux mots</button> : ''}
+      {gameState.result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}><SlCheck className="inline-block align-middle" /> Vérifie les mots</button></div> : ''}
     </div>
 
   )
@@ -191,9 +223,10 @@ function LetterInput(props: any) {
 }
 
 function Answer(props: any) {
+  const wordToGuess = props.word
   return (
     <div className="answer">
-      {props.word.split("").map((letter: any, i: number) => {
+      {wordToGuess.split("").map((letter: any, i: number) => {
         return (<AnswerInput letter={letter} key={i} />)
       })}
       <AnswerInput letter="" />
@@ -210,6 +243,7 @@ function AnswerInput(props: any) {
       type='text'
       value={props.letter}
       placeholder=''
+      readOnly={true}
     />
   )
 }
