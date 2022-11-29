@@ -37,6 +37,8 @@ const initialGameState : GameState = {
 type AppState = {
   wordlist: string[];
   wordToGuess: string;
+  gameCount: number;
+  score: number;
 }
 
 export default function Home() {
@@ -45,20 +47,23 @@ export default function Home() {
   //const wordToGuess = useWLStore((state:any) => state.wordToGuess);
   // const setWordToGuess = useWLStore((state:any) => state.setWordToGuess);
   
-  const [appState, setAppState] = useState<AppState>({wordlist: initialWordList, wordToGuess:  initialWordList[Math.floor(Math.random() * initialWordList.length)]})
+  const [appState, setAppState] = useState<AppState>({wordlist: initialWordList, wordToGuess:  initialWordList[Math.floor(Math.random() * initialWordList.length)], gameCount: 0, score: 0})
 
 
   const handleNewGame = () => {
-    console.log("handleNewGame")
     const newWordToGuess = initialWordList[Math.floor(Math.random() * initialWordList.length)]
     setAppState({...appState, wordToGuess: newWordToGuess})
+  }
+
+  const incScore = (inc: 0 | 1) => {
+    setAppState({...appState, gameCount: appState.gameCount+1, score: appState.score+inc})
   }
   
   // useEffect(() => {
   //   handleNewGame()
   // }, []);
 
-  return(<Game wordToGuess={appState.wordToGuess} handleNewGame={handleNewGame} />)
+  return(<Game wordToGuess={appState.wordToGuess} handleNewGame={handleNewGame} gameCount={appState.gameCount} score={appState.score} incScore={incScore} />)
 }
 
 
@@ -73,6 +78,9 @@ type GameState = {
 type GameProps = {
   wordToGuess: string;
   handleNewGame: () => void;
+  score: number;
+  gameCount: number;
+  incScore: (inc: 0 | 1) => void;
 }
 
 
@@ -134,10 +142,11 @@ function Game(props: GameProps) {
   const submitWord = () => {
     if (props.wordToGuess.toUpperCase() === gameState.letters.join('').toUpperCase()) {
       setGameState({...gameState, result: res.WIN})
+      props.incScore(1)
       speech("Bien joué!")
-      // window.location.reload();
     } else {
       setGameState({...gameState, result: res.LOOSE})
+      props.incScore(0)
       speech("Non, ce n'est pas ça")
     }
     focusLastInput()
@@ -192,6 +201,11 @@ function Game(props: GameProps) {
       {gameState.result === res.WIN ? <div className="text-3xl font-bold text-purple py-10 ">Bien joué! 😊</div> : ''}
       {gameState.result !== res.NO_RESULT ? <button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={reloadGame}><SlPlus className="inline-block align-middle" /> Nouveaux mots</button> : ''}
       {gameState.result == res.NO_RESULT ? <div><br /><button className="inline-block px-6 py-2.5 bg-purple text-white font-medium text-xl leading-tight uppercase rounded shadow-md hover:bg-purple hover:shadow-lg focus:bg-purple focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple active:shadow-lg transition duration-150 ease-in-out" onClick={() => submitWord()}><SlCheck className="inline-block align-middle" /> Vérifie les mots</button></div> : ''}
+      <br />
+      <br />
+      <hr />
+      <br />
+      <div>Nombre de bonnes réponses : {props.score} {props.gameCount === 0 ? '' : `/ ${props.gameCount}` }</div>
     </div>
 
   )
