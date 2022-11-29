@@ -1,5 +1,5 @@
 import { SlReload, SlPlus, SlCheck } from "react-icons/sl";
-import { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
 
 
 const initialWordList = ['la moustache', 'le chemin', 'je cherche', 'un cheval', "j'achète", 'la niche', 'un chat', 'un chien'];
@@ -24,11 +24,19 @@ const res = {
   LOOSE: 'loose',
 }
 
-const initialGameState = {
+
+
+const initialGameState : GameState = {
   ids : [0],
   letters: [],
   inputRefs: [],
   result: res.NO_RESULT,
+}
+
+
+type AppState = {
+  wordlist: string[];
+  wordToGuess: string;
 }
 
 export default function Home() {
@@ -37,7 +45,7 @@ export default function Home() {
   //const wordToGuess = useWLStore((state:any) => state.wordToGuess);
   // const setWordToGuess = useWLStore((state:any) => state.setWordToGuess);
   
-  const [appState, setAppState] = useState<any>({wordlist: initialWordList, wordToGuess:  initialWordList[Math.floor(Math.random() * initialWordList.length)]})
+  const [appState, setAppState] = useState<AppState>({wordlist: initialWordList, wordToGuess:  initialWordList[Math.floor(Math.random() * initialWordList.length)]})
 
 
   const handleNewGame = () => {
@@ -55,13 +63,27 @@ export default function Home() {
 
 
 
-function Game(props: any) {
+type GameState = {
+  ids: number[];
+  letters: string[];
+  inputRefs: any[];
+  result: string;
+}
+
+type GameProps = {
+  wordToGuess: string;
+  handleNewGame: () => void;
+}
+
+
+
+function Game(props: GameProps) {
 
   const textInputs = useRef<any>(null);
-  const repeatBtn = useRef<any>(null);
+  const repeatBtn = useRef<HTMLButtonElement>(null);
 
-  const [gameState, setGameState] = useState<any>(initialGameState)
-  const [say, setSay] = useState<any>(true)
+  const [gameState, setGameState] = useState<GameState>(initialGameState)
+  const [mustSpeak, setMustSpeak] = useState<boolean>(true)
 
   const handleInputLetter = (id: number, ref: any, letter: string) => {
     
@@ -128,7 +150,7 @@ function Game(props: any) {
   const reloadGame = () => {
     setGameState(initialGameState)
     props.handleNewGame()
-    setSay(true)
+    setMustSpeak(true)
   }
 
   useEffect(() => {
@@ -136,9 +158,9 @@ function Game(props: any) {
     if (textInputs !== null) {
       textInputs.current.lastChild.value = ''
     }
-    if (say) {
+    if (mustSpeak) {
       setTimeout(speechHandler, 300)
-      setSay(false)
+      setMustSpeak(false)
     }
   });
 
@@ -175,12 +197,20 @@ function Game(props: any) {
   )
 }
 
-function LetterInput(props: any) {
+type LetterInputProps = {
+  id: number;
+  key: number;
+  handleInputLetter: (id: number, ref: any, letter: string) => void;
+  handleDeleteLetter: () => void;
+  focusLastInput: () => void;
+}
+
+function LetterInput(props: LetterInputProps) {
   const [letter, setLetter] = useState("")
 
   const textInput: React.MutableRefObject<null> = useRef(null);
 
-  const handleKeyDown = (event: any) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Backspace") {
       console.log('Backspace key pressed')
       props.handleDeleteLetter()
@@ -193,7 +223,7 @@ function LetterInput(props: any) {
 
   const regex = new RegExp("[a-zàâçéèêëîïôûùüÿñæœ ']", "i");
 
-  const handleChangeValue = (event: any) => {
+  const handleChangeValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     const letter = event.target.value
     if (regex.test(letter)) {
       setLetter(letter);
@@ -201,12 +231,10 @@ function LetterInput(props: any) {
     }
   }
 
-  // text-7xl w-14
-
   return (
     <input
       ref={textInput}
-      id={props.id}
+      id={props.id.toString()}
       autoCapitalize="off"
       className="text-2xl w-4 m-0.5 sm:text-5xl sm:w-10 sm:m-1 font-mono shadow appearance-none border-none rounded text-purple leading-tight focus:outline-none focus:shadow-outline p-0 text-center"
       maxLength={1}
@@ -222,19 +250,28 @@ function LetterInput(props: any) {
   )
 }
 
-function Answer(props: any) {
+type AnswerProps = {
+  word: string;
+}
+
+function Answer(props: AnswerProps) {
   const wordToGuess = props.word
   return (
     <div className="answer">
-      {wordToGuess.split("").map((letter: any, i: number) => {
+      {wordToGuess.split("").map((letter: string, i: number) => {
         return (<AnswerInput letter={letter} key={i} />)
       })}
-      <AnswerInput letter="" />
+      <AnswerInput letter="" key={1000} />
     </div>
   )
 }
 
-function AnswerInput(props: any) {
+type AnswerInputProps = {
+  letter: string;
+  key: number
+}
+
+function AnswerInput(props: AnswerInputProps) {
   return (
     <input
       autoCapitalize="off"
